@@ -1,14 +1,17 @@
 import { Controller, Get, Post } from '@nestjs/common';
+import { TableService } from './table.service';
 
 @Controller('table')
 export class TableController {
+  constructor(private readonly tableService: TableService) {}
+
   @Get()
   findAll(): string {
-    return 'This action returns all tables';
+    return this.tableService.findAll();
   }
 
   @Post()
   create(): string {
-    return 'This action adds a new table';
+    return this.tableService.create();
   }
 }
