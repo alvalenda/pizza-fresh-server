@@ -7,12 +7,12 @@ export class TableController {
   constructor(private readonly tableService: TableService) {}
 
   @Get()
-  findAll(): string {
+  findAll() {
     return this.tableService.findAll();
   }
 
   @Post()
-  create(@Body() createTableDto: CreateTableDto): string {
+  create(@Body() createTableDto: CreateTableDto) {
     return this.tableService.create(createTableDto);
   }
 }
