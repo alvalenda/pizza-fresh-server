@@ -40,6 +40,7 @@ export class TableService {
   }
 
   async delete(id: string) {
+    await this.findById(id); // check if record exists
     await this.prisma.table.delete({ where: { id } });
   }
 }
