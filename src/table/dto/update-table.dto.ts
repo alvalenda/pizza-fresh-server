@@ -1,14 +1,9 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { ApiProperty } from '@nestjs/swagger';
+import { PartialType } from '@nestjs/swagger';
 import { CreateTableDto } from './create-table.dto';
 
-export class UpdateTableDto extends PartialType(CreateTableDto) {
-  @ApiProperty({
-    description: 'O número da mesa',
-    example: 13,
-  })
-  number: number;
-}
+export class UpdateTableDto extends PartialType(CreateTableDto) {}
+
+// PartialType do @nestjs/swagger corrige o problema de não copiar o decorator ApiProperty
 
 // precisa instalar a dependência:
 // npm i @nestjs/mapped-types
