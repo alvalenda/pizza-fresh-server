@@ -11,10 +11,38 @@ datasource db {
 }
 
 model Table {
-  id String @id @default(uuid())
-  number Int @unique
+  id String   @id @default(uuid())
+  number Int  @unique
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at") // @map("created_at") rename for mysql database convention
+  updatedAt DateTime @updatedAt @map("updated_at") // @map("updated_at") rename for mysql database convention
 
+  @@map("table") // rename the table in the database
+}
+
+model Product {
+  id          String @id @default(uuid())
+  name        String @unique
+  description String
+  price       Float
+  image       String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("product") // rename the table in the database
+}
+
+model User {
+  id        String @id @default(uuid())
+  name      String
+  username  String @unique
+  email     String @unique
+  password  String
+  image     String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("user") // rename the table in the database
 }
