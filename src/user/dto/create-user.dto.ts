@@ -25,7 +25,7 @@ export class CreateUserDto {
 
   @IsString()
   @MinLength(6)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/, {
+  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
     message:
       'A senha deve conter pelo menos 6 caracteres, uma letra maiúscula, uma letra minúscula e um número.',
   })
