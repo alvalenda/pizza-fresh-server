@@ -31,6 +31,7 @@ export class UserService {
   }
 
   async create(dto: CreateUserDto): Promise<User> {
+    delete dto.confirmPassword;
     const data: User = { ...dto };
 
     return await this.prisma.user.create({ data }).catch(this.handleError);
@@ -38,6 +39,7 @@ export class UserService {
 
   async update(id: string, dto: UpdateUserDto): Promise<User> {
     await this.findById(id); // check if record exists
+    delete dto.confirmPassword;
     const data: Partial<User> = { ...dto };
 
     return this.prisma.user
@@ -55,6 +57,11 @@ export class UserService {
   handleError(error: Error): undefined {
     const errorLines = error.message?.split('\n');
     const lastErrorLine = errorLines[errorLines.length - 1]?.trim();
+
+    if (!lastErrorLine) {
+      console.error(error);
+    }
+
     throw new UnprocessableEntityException(
       lastErrorLine || 'Something went wrong',
     );
