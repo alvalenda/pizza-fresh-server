@@ -12,14 +12,28 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
+  private userSelect = {
+    id: true,
+    name: true,
+    username: true,
+    email: true,
+    password: false,
+    image: true,
+    createdAt: true,
+    updatedAt: true,
+  };
+
   constructor(private readonly prisma: PrismaService) {}
 
   findAll(): Promise<User[]> {
-    return this.prisma.user.findMany();
+    return this.prisma.user.findMany({ select: this.userSelect });
   }
 
   async findById(id: string): Promise<User> {
-    const record = await this.prisma.user.findUnique({ where: { id } });
+    const record = await this.prisma.user.findUnique({
+      where: { id },
+      select: this.userSelect,
+    });
 
     if (!record) {
       throw new NotFoundException(`User with ID '${id}' not found`);
@@ -45,7 +59,9 @@ export class UserService {
       password: await bcrypt.hash(dto.password, 10),
     };
 
-    return await this.prisma.user.create({ data }).catch(this.handleError);
+    return await this.prisma.user
+      .create({ data, select: this.userSelect })
+      .catch(this.handleError);
   }
 
   async update(id: string, dto: UpdateUserDto): Promise<User> {
@@ -65,13 +81,16 @@ export class UserService {
     }
 
     return this.prisma.user
-      .update({ where: { id }, data })
+      .update({ where: { id }, select: this.userSelect, data })
       .catch(this.handleError);
   }
 
   async delete(id: string) {
     await this.findById(id); // check if record exists
-    await this.prisma.user.delete({ where: { id } });
+    return this.prisma.user.delete({
+      where: { id },
+      select: this.userSelect,
+    });
   }
 
   // ============================================================
