@@ -45,9 +45,9 @@ export class ProductService {
       .catch(this.handleError);
   }
 
-  async delete(id: string) {
+  async delete(id: string): Promise<Product> {
     await this.findById(id); // check if record exists
-    await this.prisma.product.delete({ where: { id } });
+    return this.prisma.product.delete({ where: { id } });
   }
 
   // ============================================================

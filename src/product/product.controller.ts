@@ -44,9 +44,9 @@ export class ProductController {
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
+  // @HttpCode(HttpStatus.NO_CONTENT) // quebra quando envia ID inexistente
   @ApiOperation({ summary: 'Remover um produto pelo ID' })
   delete(@Param('id') id: string) {
-    this.productService.delete(id);
+    return this.productService.delete(id);
   }
 }
