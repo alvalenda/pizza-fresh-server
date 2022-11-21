@@ -1,5 +1,6 @@
 import { PrismaService } from '$/prisma/prisma.service';
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
@@ -7,6 +8,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -27,20 +29,40 @@ export class UserService {
   }
 
   async findOne(id: string): Promise<User> {
-    return await this.findById(id); // check if record exists
+    return this.findById(id); // check if record exists
   }
 
   async create(dto: CreateUserDto): Promise<User> {
+    if (dto.confirmPassword !== dto.password) {
+      throw new BadRequestException(
+        'Senha e confirmação de senha não conferem',
+      );
+    }
+
     delete dto.confirmPassword;
-    const data: User = { ...dto };
+    const data: User = {
+      ...dto,
+      password: await bcrypt.hash(dto.password, 10),
+    };
 
     return await this.prisma.user.create({ data }).catch(this.handleError);
   }
 
   async update(id: string, dto: UpdateUserDto): Promise<User> {
     await this.findById(id); // check if record exists
+
+    if (dto.password) {
+      if (dto.confirmPassword !== dto.password) {
+        throw new BadRequestException('Senhas informadas não conferem');
+      }
+    }
+
     delete dto.confirmPassword;
     const data: Partial<User> = { ...dto };
+
+    if (data.password) {
+      data.password = await bcrypt.hash(data.password, 10);
+    }
 
     return this.prisma.user
       .update({ where: { id }, data })
