@@ -1,9 +1,6 @@
 import { PrismaService } from '$/prisma/prisma.service';
-import {
-  Injectable,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { handleError } from '$/utils/handle-error.util';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
@@ -33,7 +30,7 @@ export class ProductService {
   async create(dto: CreateProductDto): Promise<Product> {
     const data: Product = { ...dto };
 
-    return await this.prisma.product.create({ data }).catch(this.handleError);
+    return await this.prisma.product.create({ data }).catch(handleError);
   }
 
   async update(id: string, dto: UpdateProductDto): Promise<Product> {
@@ -42,7 +39,7 @@ export class ProductService {
 
     return this.prisma.product
       .update({ where: { id }, data })
-      .catch(this.handleError);
+      .catch(handleError);
   }
 
   async delete(id: string): Promise<Product> {
@@ -51,12 +48,4 @@ export class ProductService {
   }
 
   // ============================================================
-
-  handleError(error: Error): undefined {
-    const errorLines = error.message?.split('\n');
-    const lastErrorLine = errorLines[errorLines.length - 1]?.trim();
-    throw new UnprocessableEntityException(
-      lastErrorLine || 'Something went wrong',
-    );
-  }
 }
