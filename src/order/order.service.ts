@@ -1,24 +1,52 @@
 import { PrismaService } from '$/prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
+import { handleError } from '$/utils/handle-error.util';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { Order } from './entities/order.entity';
 
 @Injectable()
 export class OrderService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createOrderDto: CreateOrderDto) {
-    return 'This action adds a new order';
+  findAll(): Promise<Order[]> {
+    return this.prisma.order.findMany();
   }
 
-  findAll() {
-    return `This action returns all order`;
+  async findById(id: string): Promise<Order> {
+    const record = await this.prisma.order.findUnique({ where: { id } });
+
+    if (!record) {
+      throw new NotFoundException(`Order with ID '${id}' not found`);
+    }
+
+    return record;
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} order`;
+  async findOne(id: string): Promise<Order> {
+    return await this.findById(id); // check if record exists
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} order`;
+  async create(dto: CreateOrderDto): Promise<Order> {
+    const data: Prisma.OrderCreateInput = {
+      user: {
+        connect: {
+          id: dto.userId,
+        },
+      },
+      table: {
+        connect: {
+          number: dto.tableNumber,
+        },
+      },
+    };
+
+    return await this.prisma.order.create({ data }).catch(handleError);
+  }
+
+  async delete(id: string) {
+    await this.findById(id); // check if record exists
+    await this.prisma.order.delete({ where: { id } });
   }
 }
+// ============================================================

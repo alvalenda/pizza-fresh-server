@@ -28,7 +28,7 @@ export class OrderController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Remover um pedido pelo ID' })
-  remove(@Param('id') id: string) {
-    return this.orderService.remove(id);
+  delete(@Param('id') id: string) {
+    return this.orderService.delete(id);
   }
 }
