@@ -7,7 +7,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 
 @Injectable()
 export class OrderService {
-  private selectOrder = {
+  private selectAllOrders = {
     id: true,
     table: {
       select: {
@@ -19,37 +19,66 @@ export class OrderService {
         name: true,
       },
     },
-    products: {
+    _count: {
       select: {
-        name: true,
+        products: true,
       },
     },
   };
 
   constructor(private readonly prisma: PrismaService) {}
 
-  findAll(): Promise<OrderWithRelations[]> {
-    return this.prisma.order.findMany({ select: this.selectOrder });
-  }
-
-  async findById(id: string): Promise<OrderWithRelations> {
-    const record = await this.prisma.order.findUnique({
-      where: { id },
-      select: this.selectOrder,
+  findAll() {
+    return this.prisma.order.findMany({
+      select: {
+        id: true,
+        table: {
+          select: {
+            number: true,
+          },
+        },
+        user: {
+          select: {
+            name: true,
+          },
+        },
+        _count: {
+          select: {
+            products: true,
+          },
+        },
+      },
     });
-
-    if (!record) {
-      throw new NotFoundException(`Order with ID '${id}' not found`);
-    }
-
-    return record;
   }
 
-  async findOne(id: string): Promise<OrderWithRelations> {
-    return await this.findById(id); // check if record exists
+  async findOne(id: string) {
+    return await this.prisma.order.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            name: true,
+          },
+        },
+        table: {
+          select: {
+            number: true,
+          },
+        },
+        products: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+            image: true,
+            description: true,
+          },
+        },
+      },
+    }); // check if record exists
   }
 
-  async create(dto: CreateOrderDto): Promise<OrderWithRelations> {
+  async create(dto: CreateOrderDto) {
     const data: Prisma.OrderCreateInput = {
       user: {
         connect: {
@@ -69,13 +98,12 @@ export class OrderService {
     return await this.prisma.order
       .create({
         data,
-        select: this.selectOrder,
+        select: this.selectAllOrders,
       })
       .catch(handleError);
   }
 
   async delete(id: string) {
-    await this.findById(id); // check if record exists
     await this.prisma.order.delete({ where: { id } });
   }
 }
