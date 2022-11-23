@@ -6,25 +6,6 @@ import { CreateOrderDto } from './dto/create-order.dto';
 
 @Injectable()
 export class OrderService {
-  private selectAllOrders = {
-    id: true,
-    table: {
-      select: {
-        number: true,
-      },
-    },
-    user: {
-      select: {
-        name: true,
-      },
-    },
-    _count: {
-      select: {
-        products: true,
-      },
-    },
-  };
-
   constructor(private readonly prisma: PrismaService) {}
 
   findAll() {
@@ -97,7 +78,24 @@ export class OrderService {
     return await this.prisma.order
       .create({
         data,
-        select: this.selectAllOrders,
+        select: {
+          id: true,
+          table: {
+            select: {
+              number: true,
+            },
+          },
+          user: {
+            select: {
+              name: true,
+            },
+          },
+          _count: {
+            select: {
+              products: true,
+            },
+          },
+        },
       })
       .catch(handleError);
   }
