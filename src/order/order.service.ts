@@ -1,7 +1,6 @@
 import { PrismaService } from '$/prisma/prisma.service';
-import type { OrderWithRelations } from '$/types/types';
 import { handleError } from '$/utils/handle-error.util';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
 
@@ -108,3 +107,4 @@ export class OrderService {
   }
 }
 // ============================================================
+// Aula 13 - Dados extras no pedido. Adicionando informações na Join Table
