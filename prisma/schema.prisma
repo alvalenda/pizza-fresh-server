@@ -32,7 +32,7 @@ model Product {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  orders Order[] // many to many relation
+  orders OrderProduct[] // many to many relation - join table
 
   @@map("product") // rename the table in the database
 }
@@ -62,10 +62,26 @@ model Order {
   table   Table  @relation(fields: [tableId], references: [id])
   tableId String @map("table_id")
 
-  products Product[] // many to many relation
+  products OrderProduct[] // many to many relation - join table
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("order") // rename the table in the database
+}
+
+model OrderProduct {
+  id String @id @default(uuid())
+
+  order   Order  @relation(fields: [orderId], references: [id])
+  orderId String @map("order_id")
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId String  @map("product_id")
+
+  quantity    Int
+  description String
+
+  @@unique([orderId, productId]) // composite primary key
+  @@map("order_to_product") // rename the table in the database
 }

@@ -2,6 +2,7 @@ import { PrismaService } from '$/prisma/prisma.service';
 import { handleError } from '$/utils/handle-error.util';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { CreateOrderProductDto } from './dto/create-order-product.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 
 @Injectable()
@@ -22,9 +23,15 @@ export class OrderService {
             name: true,
           },
         },
-        _count: {
+        products: {
           select: {
-            products: true,
+            product: {
+              select: {
+                name: true,
+              },
+            },
+            quantity: true,
+            description: true,
           },
         },
       },
@@ -47,10 +54,16 @@ export class OrderService {
         },
         products: {
           select: {
-            id: true,
-            name: true,
-            price: true,
-            image: true,
+            product: {
+              select: {
+                id: true,
+                name: true,
+                price: true,
+                image: true,
+                description: true,
+              },
+            },
+            quantity: true,
             description: true,
           },
         },
@@ -71,7 +84,13 @@ export class OrderService {
         },
       },
       products: {
-        connect: dto.products.map((id) => ({ id })),
+        createMany: {
+          data: dto.products.map((CreateOrderProductDto) => ({
+            productId: CreateOrderProductDto.productId,
+            quantity: CreateOrderProductDto.quantity,
+            description: CreateOrderProductDto.description,
+          })),
+        },
       },
     };
 
@@ -90,9 +109,15 @@ export class OrderService {
               name: true,
             },
           },
-          _count: {
+          products: {
             select: {
-              products: true,
+              product: {
+                select: {
+                  name: true,
+                },
+              },
+              quantity: true,
+              description: true,
             },
           },
         },
