@@ -23,15 +23,9 @@ export class OrderService {
             name: true,
           },
         },
-        products: {
+        _count: {
           select: {
-            product: {
-              select: {
-                name: true,
-              },
-            },
-            quantity: true,
-            description: true,
+            products: true,
           },
         },
       },
